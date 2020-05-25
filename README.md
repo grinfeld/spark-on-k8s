@@ -71,4 +71,4 @@ if other than minikube context chosen, execute:
 
 Check k8s cluster end-point: 
 
-```kubectl cluster-info```
+`kubectl cluster-info``
