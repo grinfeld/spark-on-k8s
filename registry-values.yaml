@@ -7,6 +7,6 @@ spec:
   selector:
     app: docker-registry
   ports:
-    - port: 30000
+    - port: 5000
       targetPort: 5000
       nodePort: 30000
