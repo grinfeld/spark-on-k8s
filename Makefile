@@ -33,10 +33,6 @@ bin/helm: tmp/helm
 	cp -a tmp/helm/helm bin/helm
 	chmod +x bin/helm
 
-bin/tiller: tmp/helm
-	cp -a tmp/helm/tiller bin/tiller
-	chmod +x bin/tiller
-
 bin/minikube:
 	curl -Lo bin/minikube https://storage.googleapis.com/minikube/releases/$(MINIKUBE_VERSION)/minikube-$(OS)-$(ARCH)
 	chmod +x bin/minikube
@@ -95,7 +91,7 @@ patch-SPARK-28921:
 	curl -Lo tmp/kubernetes-client-4.4.2.jar https://repo1.maven.org/maven2/io/fabric8/kubernetes-client/4.4.2/kubernetes-client-4.4.2.jar
 
 tmp/spark: tmp/spark.tgz patch-SPARK-28921
-	cd tmp && tar xvzf spark.tgz && mv spark-${SPARK_VERSION}${SPARK_VERSION_SUFFIX} spark && rm -rfv spark/jars/kubernetes-*.jar && cp -av kubernetes-*.jar spark/jars/
+	cd tmp && tar xvzf spark.tgz && rm -rf spark && mv spark-${SPARK_VERSION}${SPARK_VERSION_SUFFIX} spark && rm -rfv spark/jars/kubernetes-*.jar && cp -av kubernetes-*.jar spark/jars/
 
 .PHONY: docker-build
 docker-build: tmp/spark

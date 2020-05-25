@@ -18,6 +18,8 @@ A hypervisor for running minikube. Check possibilities [here](https://minikube.s
 
 ## Instructions
 
+Since, we are using **docker** driver, you should update your ``/etc/docker/daemon.json`` and add ``{.... "insecure-registries" : ["127.0.0.1:30000", "127.0.0.1:5000"] .... }`` and restart docker (see https://docs.docker.com/registry/insecure/).
+
 ```bash
 # this will install k8s tooling locally, start minikube, initialize helm and deploy a docker registry chart to your minikube
 make
@@ -54,7 +56,6 @@ $SPARK_HOME/bin/spark-submit \
 # deletes minikube and clean up downloaded tools
 make clean
 ```
-
 
 If you have multiple k8s contexts
 
