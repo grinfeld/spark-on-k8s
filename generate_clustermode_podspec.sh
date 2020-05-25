@@ -54,7 +54,7 @@ spec:
     - spark.kubernetes.authenticate.driver.serviceAccountName=spark
     - --class
     - org.apache.spark.examples.SparkPi
-    - local:///opt/spark/examples/jars/spark-examples_2.11-2.4.4.jar
+    - local:///opt/spark/examples/jars/spark-examples_2.11-2.4.5.jar
     env:
     - name: SPARK_HOME
       value: /opt/spark

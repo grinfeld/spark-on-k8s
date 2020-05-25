@@ -37,7 +37,7 @@ $SPARK_HOME/bin/spark-submit \
     --deploy-mode client \
     --conf spark.kubernetes.container.image=$(./get_image_name.sh spark) \
     --class org.apache.spark.examples.SparkPi \
-    $SPARK_HOME/examples/jars/spark-examples_2.11-2.4.4.jar
+    $SPARK_HOME/examples/jars/spark-examples_2.11-2.4.5.jar
 
 # ... and now, the same job but from within a pod in cluster mode
 ./generate_clustermode_podspec.sh

@@ -1,20 +1,23 @@
-SPARK_VERSION ?= 2.4.4
+SPARK_VERSION ?= 2.4.5
 SPARK_VERSION_SUFFIX ?= -bin-hadoop2.7
-K8S_VERSION ?= v1.15.4
-HELM_VERSION ?= v2.14.2
+K8S_VERSION ?= v1.18.2
+HELM_VERSION ?= v3.2.1
 MINIKUBE_VERSION ?= latest
-MINIKUBE_VMDRIVER ?= virtualbox
+MINIKUBE_VMDRIVER ?= docker
 MIRROR ?= archive.apache.org
 
 OS ?= $(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH ?= amd64
 
 .PHONY: all
-all: k8s-tooling start-minikube helm-init start-registry
+all: k8s-tooling start-minikube start-registry
 
 #################
 ## k8s tooling ##
 #################
+
+tmp/create:
+	mkdir -p "tmp"
 
 bin/kubectl:
 	curl -Lo bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$(K8S_VERSION)/bin/$(OS)/$(ARCH)/kubectl
@@ -38,12 +41,16 @@ bin/minikube:
 	curl -Lo bin/minikube https://storage.googleapis.com/minikube/releases/$(MINIKUBE_VERSION)/minikube-$(OS)-$(ARCH)
 	chmod +x bin/minikube
 
+.PHONY: helm-repo-update
+helm-repo-update: bin/helm
+	./bin/helm repo update
+
 .PHONY: helm-init
-helm-init: bin/helm bin/tiller
+helm-init: bin/helm
 	./bin/helm init --wait
 
 .PHONY: k8s-tooling
-k8s-tooling: bin/kubectl bin/helm bin/tiller bin/minikube
+k8s-tooling: tmp/create bin/kubectl bin/helm bin/minikube
 
 ##############
 ## Minikube ##
@@ -63,6 +70,8 @@ stop-minikube: bin/minikube
 
 .PHONY: start-registry
 start-registry:
+	./bin/helm repo add stable https://kubernetes-charts.storage.googleapis.com
+	./bin/helm repo update
 	./bin/helm upgrade --install --wait registry -f registry-values.yaml stable/docker-registry
 	echo "Registry successfully deployed in minikube. Make sure you add $(shell minikube ip):30000 to your insecure registries before continuing. Check https://docs.docker.com/registry/insecure/ for more information on how to do it in your platform."
 
