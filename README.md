@@ -54,3 +54,21 @@ $SPARK_HOME/bin/spark-submit \
 # deletes minikube and clean up downloaded tools
 make clean
 ```
+
+
+If you have multiple k8s contexts
+
+``kubectl config get-contexts``
+
+    CURRENT   NAME                                                 CLUSTER                                              AUTHINFO                                             NAMESPACE
+              docker-desktop                                       docker-desktop                                       docker-desktop
+              docker-for-desktop                                   docker-desktop                                       docker-desktop
+    *         minikube                                             minikube                                             minikube
+
+if other than minikube context chosen, execute: 
+
+``kubectl config use-context minikube``
+
+Check k8s cluster end-point: 
+
+```kubectl cluster-info```
