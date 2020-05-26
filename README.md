@@ -72,7 +72,7 @@ if other than minikube context chosen, execute:
 
 Check k8s cluster end-point: 
 
-`kubectl cluster-info``
+``kubectl cluster-info``
 
 If you want to run k8s web dashboard, run
 

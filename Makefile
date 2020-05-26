@@ -3,7 +3,7 @@ SPARK_VERSION_SUFFIX ?= -bin-hadoop2.7
 K8S_VERSION ?= v1.18.2
 HELM_VERSION ?= v3.2.1
 MINIKUBE_VERSION ?= latest
-MINIKUBE_VMDRIVER ?= docker
+MINIKUBE_VMDRIVER ?= virtualbox
 MIRROR ?= archive.apache.org
 
 OS ?= $(shell uname -s | tr '[:upper:]' '[:lower:]')
