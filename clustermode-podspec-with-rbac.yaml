@@ -1,6 +1,3 @@
-#!/usr/bin/env bash
-
-cat > clustermode-podspec-with-rbac.yaml << EOF
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -59,6 +56,5 @@ spec:
     - name: SPARK_HOME
       value: /opt/spark
     resources: {}
-    image: localhost/spark:latest
+    image: spark:latest
     imagePullPolicy: Always
-EOF

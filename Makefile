@@ -2,15 +2,13 @@ SPARK_VERSION ?= 2.4.5
 SPARK_VERSION_SUFFIX ?= -bin-hadoop2.7
 K8S_VERSION ?= v1.18.2
 HELM_VERSION ?= v3.2.1
-MINIKUBE_VERSION ?= latest
-MINIKUBE_VMDRIVER ?= virtualbox
 MIRROR ?= archive.apache.org
 
 OS ?= $(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH ?= amd64
 
 .PHONY: all
-all: k8s-tooling start-minikube start-registry
+all: k8s-tooling docker-build
 
 #################
 ## k8s tooling ##
@@ -33,10 +31,6 @@ bin/helm: tmp/helm
 	cp -a tmp/helm/helm bin/helm
 	chmod +x bin/helm
 
-bin/minikube:
-	curl -Lo bin/minikube https://storage.googleapis.com/minikube/releases/$(MINIKUBE_VERSION)/minikube-$(OS)-$(ARCH)
-	chmod +x bin/minikube
-
 .PHONY: helm-repo-update
 helm-repo-update: bin/helm
 	./bin/helm repo update
@@ -45,35 +39,12 @@ helm-repo-update: bin/helm
 helm-init: bin/helm
 	./bin/helm init --wait
 
+.PHONY: switch/context
+helm-init: switch/context
+	.bin/kubectl config use-context docker-desktop
+
 .PHONY: k8s-tooling
-k8s-tooling: tmp/create bin/kubectl bin/helm bin/minikube
-
-##############
-## Minikube ##
-##############
-
-.PHONY: start-minikube
-start-minikube: bin/minikube
-	./bin/minikube start --cpus=4 --memory=4000mb --vm-driver=$(MINIKUBE_VMDRIVER) --kubernetes-version=$(K8S_VERSION)
-
-.PHONY: stop-minikube
-stop-minikube: bin/minikube
-	./bin/minikube stop
-
-#####################
-## Docker registry ##
-#####################
-
-.PHONY: start-registry
-start-registry:
-	./bin/helm repo add stable https://kubernetes-charts.storage.googleapis.com
-	./bin/helm repo update
-	./bin/helm upgrade --install --wait registry -f registry-values.yaml stable/docker-registry
-	echo "Registry successfully deployed in minikube. Make sure you add $(shell minikube ip):30000 to your insecure registries before continuing. Check https://docs.docker.com/registry/insecure/ for more information on how to do it in your platform."
-
-.PHONY: stop-registry
-stop-registry:
-	./bin/helm delete --purge registry
+k8s-tooling: tmp/create bin/kubectl switch/context bin/helm
 
 ###############################################################################
 ##                   Spark docker image building                             ##
@@ -95,14 +66,8 @@ tmp/spark: tmp/spark.tgz patch-SPARK-28921
 
 .PHONY: docker-build
 docker-build: tmp/spark
-	cd tmp/spark && ./bin/docker-image-tool.sh -r $(shell minikube ip):30000 -t latest build
-
-.PHONY: docker-push
-docker-push:
-	cd tmp/spark && ./bin/docker-image-tool.sh -r $(shell minikube ip):30000 -t latest push
+	cd tmp/spark && ./bin/docker-image-tool.sh -t latest build
 
 .PHONY: clean
 clean:
-	echo "Make sure you remove $(shell minikube ip):30000 from your list of insecure registries."
-	./bin/minikube delete
 	rm -rf tmp/* bin/*
